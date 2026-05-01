@@ -45,16 +45,6 @@ Users can comment on posts.
 - Display comments under each post
 - Basic comment interaction flow
 
-**UI example:**
-- Comment input area under posts
-- Comment list display
-
-![Comment module placeholder](https://via.placeholder.com/800x350.png?text=Comment+Module+Placeholder)
-
-**UI example:**
-- Comment input area under posts
-- Comment list display
-
 ### Post Interaction Module
 The app also supports simple post interactions.
 - Like posts
