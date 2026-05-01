@@ -1,0 +1,17 @@
+name: Postify CI workflow
+
+on:
+  push:
+
+jobs:
+  build: # Job Name
+    runs-on: ubuntu-latest #Github Runner (Free)
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # clone the code into a ubuntu runner
+
+      - name: Setup Docker
+        uses: docker/setup-buildx-actions@v4
+
+
+
