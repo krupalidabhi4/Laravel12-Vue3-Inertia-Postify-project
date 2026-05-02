@@ -2,35 +2,33 @@ FROM php:8.2-apache
 
 WORKDIR /var/www/html
 
-# Install dependencies
+ENV COMPOSER_MEMORY_LIMIT=-1
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
     unzip \
     libonig-dev \
     libzip-dev \
+    libicu-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring
+RUN docker-php-ext-install pdo_mysql mbstring zip intl bcmath
 
-# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- \
     --install-dir=/usr/local/bin --filename=composer
 
-# Copy composer files
 COPY composer.json composer.lock ./
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Copy app
 COPY . .
 
-# Permissions
+RUN cp .env.example .env || true
+RUN php artisan key:generate || true
+
 RUN chown -R www-data:www-data /var/www/html
 
-# Enable rewrite
 RUN a2enmod rewrite
 
 EXPOSE 80
