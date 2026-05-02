@@ -1,36 +1,38 @@
-# Use PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Install minimal dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
-    unzip
+    unzip \
+    libonig-dev \
+    libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- \
+    --install-dir=/usr/local/bin --filename=composer
 
-# Copy composer files and install dependencies
+# Copy composer files
 COPY composer.json composer.lock ./
+
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Copy application code
+# Copy app
 COPY . .
 
-# Set permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Enable mod_rewrite for Laravel
+# Enable rewrite
 RUN a2enmod rewrite
 
-# Expose port 80
 EXPOSE 80
 
-# Start Apache
 CMD ["apache2-foreground"]
