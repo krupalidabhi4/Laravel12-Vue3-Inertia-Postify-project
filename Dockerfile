@@ -2,33 +2,50 @@ FROM php:8.2-apache
 
 WORKDIR /var/www/html
 
+# Fix composer memory
 ENV COMPOSER_MEMORY_LIMIT=-1
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    git \
-    unzip \
-    libonig-dev \
-    libzip-dev \
-    libicu-dev \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl git unzip \
+    libonig-dev libzip-dev libicu-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo_mysql mbstring zip intl bcmath
+# Install PHP extensions required by Laravel
+RUN docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    zip \
+    intl \
+    bcmath \
+    exif \
+    pcntl
 
-RUN curl -sS https://getcomposer.org/installer | php -- \
-    --install-dir=/usr/local/bin --filename=composer
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Copy composer files first (better caching)
 COPY composer.json composer.lock ./
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+# Install dependencies (IMPORTANT FIX HERE)
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --prefer-dist \
+    --no-scripts
 
+# Copy full project
 COPY . .
 
+# Laravel setup (safe for build)
 RUN cp .env.example .env || true
 RUN php artisan key:generate || true
 
-RUN chown -R www-data:www-data /var/www/html
+# Fix permissions
+RUN chmod -R 775 storage bootstrap/cache
 
+# Enable Apache rewrite
 RUN a2enmod rewrite
 
 EXPOSE 80
