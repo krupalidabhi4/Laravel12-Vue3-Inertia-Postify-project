@@ -38,7 +38,7 @@ const loadMore = () => {
     <AuthenticatedLayout>
 
     <template #header>
-        <h1 class="text-xl font-semibold">Posts Listing</h1>
+        <h1 class="text-xl font-semibold">Post Lists</h1>
     </template>
 
     <div class="max-w-5xl mx-auto">
