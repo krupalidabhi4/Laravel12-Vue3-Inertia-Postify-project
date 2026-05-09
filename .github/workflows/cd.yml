@@ -20,6 +20,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
+            git clone https://github.com/krupalidabhi4/Laravel12-Vue3-Inertia-Postify-project.git
             cd ~/Laravel12-Vue3-Inertia-Postify-project
             git pull origin main
             docker compose pull
