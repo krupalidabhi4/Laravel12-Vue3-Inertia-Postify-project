@@ -1,0 +1,27 @@
+name: Postify code workflow
+
+
+on:
+  workflow_run:
+    workflows: ["Postify CI workflow"]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Execute remote SSH commands using password
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd ~/Laravel12-Vue3-Inertia-Postify-project
+            git pull origin main
+            docker compose pull
+            docker compose up -d    # Run all container in detached mode in background
+            docker image prune -f --filter "until=24h"
