@@ -23,5 +23,4 @@ jobs:
             cd ~/Laravel12-Vue3-Inertia-Postify-project
             git pull origin main
             docker compose pull
-            docker compose up -d    # Run all container in detached mode in background
-            docker image prune -f --filter "until=24h"
+            docker compose up -d
